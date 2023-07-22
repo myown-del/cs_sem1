@@ -1,4 +1,9 @@
-import typing as tp
+def get_pos(ch: str) -> tuple[int, int]:
+    if ch.isupper():
+        offset = 65
+    else:
+        offset = 97
+    return ord(ch) - offset, offset
 
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
@@ -15,7 +20,12 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
+    for ch in plaintext:
+        if ch.isalpha():
+            pos, offset = get_pos(ch)
+            ciphertext += chr(((pos + shift) % 26) + offset)
+        else:
+            ciphertext += ch
     return ciphertext
 
 
@@ -33,14 +43,11 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    for ch in ciphertext:
+        if ch.isalpha():
+            pos, offset = get_pos(ch)
+            plaintext += chr(((pos - shift) % 26) + offset)
+        else:
+            plaintext += ch
     return plaintext
 
-
-def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
-    """
-    Brute force breaking a Caesar cipher.
-    """
-    best_shift = 0
-    # PUT YOUR CODE HERE
-    return best_shift
