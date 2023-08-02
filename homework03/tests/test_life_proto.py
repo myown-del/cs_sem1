@@ -51,6 +51,7 @@ class TestGameOfLife(unittest.TestCase):
         game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((0, 7))
+        print(neighbours)
         self.assertEqual(3, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
