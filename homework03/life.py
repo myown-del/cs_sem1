@@ -1,6 +1,7 @@
 import pathlib
 import random
 import typing as tp
+from contextlib import suppress
 
 Cell = tp.Tuple[int, int]
 Cells = tp.List[int]
@@ -36,36 +37,30 @@ class GameOfLife:
 
     def get_neighbours(self, cell: Cell) -> Cells:
         neighbours = []
-        if cell[0] > 0:
-            neighbours.append(self.curr_generation[cell[0] - 1][cell[1]])
-        if cell[0] > 0 and cell[1] > 0:
-            neighbours.append(self.curr_generation[cell[0] - 1][cell[1] - 1])
-        if cell[1] < self.cols - 1:
-            neighbours.append(self.curr_generation[cell[0]][cell[1] + 1])
-        if cell[0] > 0 and cell[1] < self.cols - 1:
-            neighbours.append(self.curr_generation[cell[0] - 1][cell[1] + 1])
-        if cell[0] < self.rows - 1:
-            neighbours.append(self.curr_generation[cell[0] + 1][cell[1]])
-        if cell[0] < self.rows - 1 and cell[1] > 0:
-            neighbours.append(self.curr_generation[cell[0] + 1][cell[1] - 1])
-        if cell[1] > 0:
-            neighbours.append(self.curr_generation[cell[0]][cell[1] - 1])
-        if cell[1] > 0 and cell[0] < self.rows - 1:
-            neighbours.append(self.curr_generation[cell[0] + 1][cell[1] - 1])
+        row, col = cell
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if (
+                    0 <= row + i
+                    and 0 <= col + j
+                    and (i, j) != (0, 0)
+                ):
+                    with suppress(IndexError):
+                        neighbours.append(self.curr_generation[row + i][col + j])
         return neighbours
 
     def get_next_generation(self) -> Grid:
         next_generation = self.create_grid()
         for i in range(self.rows):
             for j in range(self.cols):
-                neighbours = self.get_neighbours((i, j))
+                neighbours = sum(self.get_neighbours((i, j)))
                 if self.curr_generation[i][j] == 1:
-                    if sum(neighbours) in (2, 3):
+                    if neighbours in [2, 3]:
                         next_generation[i][j] = 1
                     else:
                         next_generation[i][j] = 0
                 else:
-                    if sum(neighbours) == 3:
+                    if neighbours == 3:
                         next_generation[i][j] = 1
                     else:
                         next_generation[i][j] = 0
@@ -78,7 +73,7 @@ class GameOfLife:
 
     @property
     def is_max_generations_exceeded(self) -> bool:
-        return self.generations > self.max_generations
+        return self.generations >= self.max_generations
 
     @property
     def is_changing(self) -> bool:
